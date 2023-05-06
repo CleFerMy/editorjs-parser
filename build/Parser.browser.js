@@ -195,7 +195,7 @@ var edjsParser = function () {
         }
 
         try {
-          return this.parsers[block.type](block.data, this.config);
+          return this.parsers[block.type](block.data, this.config, 'tunes' in data ? data.tunes : {});
         } catch (err) {
           return err;
         }
