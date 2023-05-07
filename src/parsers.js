@@ -12,13 +12,7 @@ export default {
 				}
 			}
 		}
-		return `<p className="${config.paragraph.pClass}" style=${Object.entries(style).map(([k, v]) => `
-		$ {
-			k
-		}: $ {
-			v
-		}
-		`).join(';')}> ${data.text} </p>`;
+		return `<p className="${config.paragraph.pClass}" style=${Object.entries(style).map(([k, v]) => `${k}:${v}`).join(';')}> ${data.text} </p>`;
 	},
 	header: function(data) {
 		return `<h${data.level}>${data.text}</h${data.level}>`;
