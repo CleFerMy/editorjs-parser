@@ -27,7 +27,7 @@ export default class edjsParser {
             );
         }
         try {
-            return this.parsers[block.type](block.data, this.config, 'tunes' in data ? data.tunes : {});
+            return this.parsers[block.type](block.data, this.config, 'tunes' in block ? block.tunes : {});
         } catch (err) {
             return err;
         }

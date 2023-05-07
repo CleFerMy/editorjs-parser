@@ -4,6 +4,18 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -43,8 +55,24 @@ var embedMarkups = {
   defaultMarkup: "<div class=\"embed\"><iframe src=\"<%data.embed%>\" <%data.length%> class=\"embed-unknown\" allowfullscreen=\"true\" frameborder=\"0\" ></iframe></div>"
 };
 var defaultParsers = {
-  paragraph: function paragraph(data, config) {
-    return "<p class=\"".concat(config.paragraph.pClass, "\"> ").concat(data.text, " </p>");
+  paragraph: function paragraph(data, config, tunes) {
+    var style = {};
+
+    if (tunes) {
+      if ('anyTuneName' in tunes) {
+        if ('alignment' in tunes.anyTuneName) {
+          style['textAlign'] = tunes.anyTuneName.alignment;
+        }
+      }
+    }
+
+    return "<p className=\"".concat(config.paragraph.pClass, "\" style=").concat(Object.entries(style).map(function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2),
+          k = _ref2[0],
+          v = _ref2[1];
+
+      return "\n\t\t$ {\n\t\t\tk\n\t\t}: $ {\n\t\t\tv\n\t\t}\n\t\t";
+    }).join(';'), "> ").concat(data.text, " </p>");
   },
   header: function header(data) {
     return "<h".concat(data.level, ">").concat(data.text, "</h").concat(data.level, ">");
@@ -52,7 +80,7 @@ var defaultParsers = {
   list: function list(data) {
     var type = data.style === "ordered" ? "ol" : "ul";
     var items = data.items.reduce(function (acc, item) {
-      return acc + "<li>".concat(item, "</li>");
+      return acc + "<li><none></none>".concat(item, "</li>");
     }, "");
     return "<".concat(type, ">").concat(items, "</").concat(type, ">");
   },
@@ -66,12 +94,29 @@ var defaultParsers = {
     return "<blockquote ".concat(alignment, "><p>").concat(data.text, "</p><cite>").concat(data.caption, "</cite></blockquote>");
   },
   table: function table(data) {
-    var rows = data.content.map(function (row) {
-      return "<tr>".concat(row.reduce(function (acc, cell) {
-        return acc + "<td>".concat(cell, "</td>");
-      }, ""), "</tr>");
+    var thead = "";
+    var theads = [];
+
+    if (data.withHeadings) {
+      if (data.content) {
+        var shifted = data.content.shift();
+        var thead_rows = "<tr>".concat(shifted.reduce(function (acc, cell) {
+          return acc + " < td > $ {\n\t\t\t\t\tcell\n\t\t\t\t} < /td>";
+        }, ""), " < /tr>");
+        theads = shifted.reduce(function (acc, cell) {
+          acc.push(cell);
+          return acc;
+        }, []);
+        thead = "<thead>".concat(thead_rows, "</thead>");
+      }
+    }
+
+    var tbody_rows = data.content.map(function (row) {
+      return "<tr>".concat(row.reduce(function (acc, cell, index) {
+        return acc + " < td data - label = \"".concat(theads[index], "\"\n\tdata - label - visible = \"").concat(thead !== '' ? 'true' : 'false', "\" > $ {\n\t\tcell\n\t} < /td>");
+      }, ""), " < /tr>");
     });
-    return "<table><tbody>".concat(rows.join(""), "</tbody></table>");
+    return "<table>".concat(thead, "<tbody>").concat(tbody_rows.join(""), "</tbody></table>");
   },
   image: function image(data, config) {
     var imageConditions = "".concat(data.stretched ? "img-fullwidth" : "", " ").concat(data.withBorder ? "img-border" : "", " ").concat(data.withBackground ? "img-bg" : "");
@@ -107,7 +152,7 @@ var defaultParsers = {
     return data.html;
   },
   delimiter: function delimiter(data) {
-    return "<br />";
+    return "<hr />";
   },
   embed: function embed(data, config) {
     if (config.embed.useProvidedLength) {
@@ -127,6 +172,25 @@ var defaultParsers = {
         return data[p1];
       });
     }
+  },
+  AnyButton: function AnyButton(data) {
+    var testURI = new URL(data.link, "https://".concat(window.location.hostname));
+    var target = "_blank";
+
+    if (testURI.hostname === window.location.hostname) {
+      target = "_self";
+    }
+
+    return "<a href=\"".concat(data.link, "\" target=\"").concat(target, "\" className=\"button\">").concat(data.text, "</a>");
+  },
+  checklist: function checklist(data) {
+    var items = data.items.reduce(function (acc, item) {
+      return acc + "<div className=\"".concat(item.checked ? 'checked' : 'unchecked', "\"><none></none>").concat(item.text, "</div>");
+    }, "");
+    return "<div className=\"checklist\">".concat(items, "</div>");
+  },
+  warning: function warning(data) {
+    return "<div className=\"warning\"><p className=\"title\">".concat(data.title, "</p><p className=\"text\">").concat(data.text, "</p></div>");
   }
 };
 var defaultConfig = {
@@ -192,7 +256,7 @@ var edjsParser = /*#__PURE__*/function () {
       }
 
       try {
-        return this.parsers[block.type](block.data, this.config, 'tunes' in data ? data.tunes : {});
+        return this.parsers[block.type](block.data, this.config, 'tunes' in block ? block.tunes : {});
       } catch (err) {
         return err;
       }
