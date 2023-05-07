@@ -52,17 +52,21 @@ const markup = parser.parseBlock(block);
 
 ## Supported blocks
 
-- Paragraph
-- Header
-- Table
-- Raw
-- Delimiter
-- Code
-- Quote
-- List
-- Embed
-- Image
-- Simple-image
+- [Paragraph](https://github.com/editor-js/paragraph)
+- [Header](https://github.com/editor-js/paragraph)
+- [Table](https://github.com/editor-js/paragraph)
+- [Raw](https://github.com/editor-js/paragraph)
+- [Delimiter](https://github.com/editor-js/paragraph)
+- [Code](https://github.com/editor-js/paragraph)
+- [Quote](https://github.com/editor-js/paragraph)
+- [List](https://github.com/editor-js/paragraph)
+- [Embed](https://github.com/editor-js/paragraph)
+- [Image](https://github.com/editor-js/paragraph)
+- [Simple-image](https://github.com/editor-js/paragraph)
+- [Paragraph](https://github.com/editor-js/paragraph)
+- [Checklist](https://github.com/editor-js/checklist)
+- [Warning](https://github.com/editor-js/warning)
+- [AnyButton](https://github.com/kaaaaaaaaaaai/editorjs-button)
 
 **NOTE:** It is pointless to use both `image` and `simple-image` block types in the same editor insatnce, but this parser supports both of them and you can use any of them that fulfills your needs.
 

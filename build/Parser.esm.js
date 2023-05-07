@@ -71,7 +71,7 @@ var defaultParsers = {
           k = _ref2[0],
           v = _ref2[1];
 
-      return "\n\t\t$ {\n\t\t\tk\n\t\t}: $ {\n\t\t\tv\n\t\t}\n\t\t";
+      return "".concat(k, ":").concat(v);
     }).join(';'), "> ").concat(data.text, " </p>");
   },
   header: function header(data) {

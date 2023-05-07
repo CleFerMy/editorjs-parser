@@ -37,30 +37,26 @@ export default {
 			if (data.content) {
 				const shifted = data.content.shift();
 				const thead_rows = `<tr>${shifted.reduce(
-                  (acc, cell) => acc + ` < td > $ {
-					cell
-				} < /td>`,
-				"")
-		} < /tr>`;
-		theads = shifted.reduce(function(acc, cell) {
-			acc.push(cell);
-			return acc;
-		}, []);
-		thead = `<thead>${thead_rows}</thead>`;
-	}
-}
-const tbody_rows = data.content.map((row) => {
-	return `<tr>${row.reduce(
-              (acc, cell, index) => acc + ` < td data - label = "${theads[index]}"
-	data - label - visible = "${thead !==''?'true':'false'}" > $ {
-		cell
-	} < /td>`,
-	"")
-} < /tr>`;
-});
-return `<table>${thead}<tbody>${tbody_rows.join("")}</tbody></table>`;
-},
-image: function(data, config) {
+					(acc, cell) => acc + `<td>${cell}</td>`,
+					""
+				)}</tr>`;
+				theads = shifted.reduce(function (acc, cell) {
+					acc.push(cell);
+					return acc;
+				}, []);
+				thead = `<thead>${thead_rows}</thead>`;
+			}
+			
+		}
+		const tbody_rows = data.content.map((row) => {
+			return `<tr>${row.reduce(
+				(acc, cell, index) => acc + `<td data-label="${theads[index]}" data-label-visible="${thead !==''?'true':'false'}">${cell}</td>`,
+				""
+			)}</tr>`;
+		});
+		return `<table>${thead}<tbody>${tbody_rows.join("")}</tbody></table>`;
+	},
+	image: function(data, config) {
 		const imageConditions = `${data.stretched ? "img-fullwidth" : ""} ${
       data.withBorder ? "img-border" : ""
     } ${data.withBackground ? "img-bg" : ""}`;
